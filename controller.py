@@ -4,6 +4,7 @@ from app.voiceTotext import voiceTotext
 from app.picToanime import picToanime
 from app.getHitokoto import getHitokoto
 from app.getQrcode import getqrcode
+from app.qqPhone import qqPhone
 import logging
 import time
 import shutil
@@ -138,6 +139,17 @@ class auController:
         else:
             update.message.reply_text(reply_text)
 
+    def qq_phone(self,update,context):
+        if (self.configs.qqPhone == 0):
+            return update.message.reply_text('QQ🔗手机号 - 暂时关闭')
+        reply_text = 'QQ🔗手机号\n' \
+                     '/qq [QQnumber]\n' \
+                     '例: /qq 123'
+        if(len(context.args) == 1):
+            reply_text = qqPhone(context.args[0],self.configs.redis_host)
+        update.message.reply_text(reply_text)
+
+
     def error(self,update, context):
         """Log Errors caused by Updates."""
         self.logger.warning('Update "%s" caused error "%s"', update, context.error)
@@ -157,6 +169,7 @@ class auController:
         handlers.append(CommandHandler('trash', self.trash))
         handlers.append(CommandHandler('quoto',self.get_hitokoto))
         handlers.append(CommandHandler('qr',self.get_qrcode))
+        handlers.append(CommandHandler('qq',self.qq_phone))
         handlers.append(MessageHandler(Filters.text,self.echo))
         handlers.append(MessageHandler(Filters.voice,self.voice_to_text))
         handlers.append(MessageHandler(Filters.photo, self.picture_to_anime))
